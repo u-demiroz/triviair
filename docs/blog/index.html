@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — TrivAir</title>
+  <meta name="description" content="Aviation news, trivia, history and spotting guides from the TrivAir team.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0A0E1A; color: #fff; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; max-width: 1100px; margin: 0 auto; }
+    .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; text-decoration: none; color: #fff; }
+    .logo-icon { width: 36px; height: 36px; background: #1A73E8; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .nav-links a { color: #8A9BB8; text-decoration: none; margin-left: 20px; font-size: 14px; }
+    .nav-links a:hover { color: #fff; }
+    .hero { text-align: center; padding: 60px 20px 40px; }
+    .hero h1 { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+    .hero p { color: #8A9BB8; font-size: 16px; }
+    .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; max-width: 1100px; margin: 0 auto 80px; padding: 0 20px; }
+    .card { background: #131929; border: 1px solid #2A3550; border-radius: 18px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.2s; }
+    .card:hover { border-color: #1A73E8; }
+    .card-img { width: 100%; height: 180px; object-fit: cover; background: #1E2940; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .card-body { padding: 20px; }
+    .card-tag { display: inline-block; background: rgba(26,115,232,0.15); color: #1A73E8; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; margin-bottom: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .card h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+    .card p { font-size: 13px; color: #8A9BB8; line-height: 1.6; margin-bottom: 12px; }
+    .card-meta { font-size: 11px; color: #4A5568; }
+    footer { border-top: 1px solid #2A3550; padding: 24px 20px; text-align: center; color: #8A9BB8; font-size: 13px; }
+    footer a { color: #8A9BB8; text-decoration: none; margin: 0 10px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="../index.html">
+    <div class="logo-icon">✈️</div>
+    TrivAir
+  </a>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="index.html">Blog</a>
+    <a href="../privacy.html">Privacy</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Aviation Blog</h1>
+  <p>Stories, history, and knowledge from the world of aviation</p>
+</div>
+
+<div class="blog-grid">
+
+  <a class="card" href="tenerife-disaster.html">
+    <div class="card-img">💥</div>
+    <div class="card-body">
+      <span class="card-tag">History</span>
+      <h2>The Tenerife Disaster: Aviation's Deadliest Day</h2>
+      <p>On March 27, 1977, two Boeing 747s collided on a foggy runway in the Canary Islands. 583 people lost their lives in the worst aviation accident in history.</p>
+      <div class="card-meta">March 2026 · 5 min read</div>
+    </div>
+  </a>
+
+  <a class="card" href="concorde.html">
+    <div class="card-img">⚡</div>
+    <div class="card-body">
+      <span class="card-tag">Aircraft</span>
+      <h2>Concorde: The Supersonic Dream That Changed Aviation</h2>
+      <p>Flying at Mach 2 at 60,000 feet, Concorde crossed the Atlantic in under 3 hours. Here's the story of the most extraordinary passenger aircraft ever built.</p>
+      <div class="card-meta">March 2026 · 6 min read</div>
+    </div>
+  </a>
+
+  <a class="card" href="iata-codes.html">
+    <div class="card-img">🔤</div>
+    <div class="card-body">
+      <span class="card-tag">Knowledge</span>
+      <h2>How Are Airport Codes Assigned? The Story Behind IATA</h2>
+      <p>Why is Istanbul IST but Los Angeles LAX? The surprisingly interesting history of how airports got their three-letter codes.</p>
+      <div class="card-meta">March 2026 · 4 min read</div>
+    </div>
+  </a>
+
+  <a class="card" href="pan-am.html">
+    <div class="card-img">🌐</div>
+    <div class="card-body">
+      <span class="card-tag">History</span>
+      <h2>Pan Am: The Airline That Shaped the World</h2>
+      <p>Pan American World Airways defined international travel for half a century. Its rise, glory, and dramatic collapse is one of the most fascinating stories in aviation history.</p>
+      <div class="card-meta">March 2026 · 7 min read</div>
+    </div>
+  </a>
+
+  <a class="card" href="spotting-guide.html">
+    <div class="card-img">🔭</div>
+    <div class="card-body">
+      <span class="card-tag">Guide</span>
+      <h2>Beginner's Guide to Plane Spotting</h2>
+      <p>How to identify aircraft by their silhouettes, engines, and liveries. A practical guide for aviation enthusiasts who want to level up their spotting skills.</p>
+      <div class="card-meta">March 2026 · 8 min read</div>
+    </div>
+  </a>
+
+  <a class="card" href="longest-flights.html">
+    <div class="card-img">🌏</div>
+    <div class="card-body">
+      <span class="card-tag">Records</span>
+      <h2>The World's Longest Non-Stop Flights</h2>
+      <p>Singapore to New York. Perth to London. These marathon flights push the limits of human endurance and modern aviation technology.</p>
+      <div class="card-meta">March 2026 · 5 min read</div>
+    </div>
+  </a>
+
+  <a class="card" href="hudson-miracle.html">
+    <div class="card-img">💧</div>
+    <div class="card-body">
+      <span class="card-tag">History</span>
+      <h2>Miracle on the Hudson: Inside Flight 1549</h2>
+      <p>On January 15, 2009, Captain Chesley Sullenberger landed US Airways 1549 on the Hudson River. All 155 people survived. Here's how it happened.</p>
+      <div class="card-meta">March 2026 · 5 min read</div>
+    </div>
+  </a>
+
+  <a class="card" href="airlines-alliances.html">
+    <div class="card-img">🤝</div>
+    <div class="card-body">
+      <span class="card-tag">Knowledge</span>
+      <h2>Star Alliance, SkyTeam, Oneworld: How Airline Alliances Work</h2>
+      <p>Why do airlines partner up? How do frequent flyer programs work across alliances? Everything you need to know about the three major airline alliances.</p>
+      <div class="card-meta">March 2026 · 4 min read</div>
+    </div>
+  </a>
+
+</div>
+
+<footer>
+  © 2026 TrivAir · <a href="../index.html">Home</a> · <a href="../privacy.html">Privacy</a>
+</footer>
+
+</body>
+</html>
