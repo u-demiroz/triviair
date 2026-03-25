@@ -12,42 +12,49 @@ class AuthService {
   User? get currentUser => _auth.currentUser;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
+  // Email / Password
+  Future<UserModel> signInWithEmail(String email, String password) async {
+    final cred = await _auth.signInWithEmailAndPassword(email: email, password: password);
+    return await _createOrGetUser(cred.user!);
+  }
+
+  Future<UserModel> registerWithEmail(String email, String password, String name) async {
+    final cred = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+    await cred.user!.updateDisplayName(name);
+    return await _createOrGetUser(cred.user!, displayName: name);
+  }
+
+  // Google
   Future<UserModel?> signInWithGoogle() async {
     try {
       final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return null;
-
       final googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-
       final userCredential = await _auth.signInWithCredential(credential);
-      final user = userCredential.user!;
-
-      return await _createOrGetUser(user);
+      return await _createOrGetUser(userCredential.user!);
     } catch (e) {
       rethrow;
     }
   }
 
+  // Apple
   Future<UserModel?> signInWithApple() async {
     try {
       final provider = AppleAuthProvider();
       provider.addScope('email');
       provider.addScope('name');
-
       final userCredential = await _auth.signInWithProvider(provider);
-      final user = userCredential.user!;
-
-      return await _createOrGetUser(user);
+      return await _createOrGetUser(userCredential.user!);
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<UserModel> _createOrGetUser(User firebaseUser) async {
+  Future<UserModel> _createOrGetUser(User firebaseUser, {String? displayName}) async {
     final docRef = _db.collection(AppConstants.colUsers).doc(firebaseUser.uid);
     final doc = await docRef.get();
 
@@ -55,11 +62,10 @@ class AuthService {
       return UserModel.fromFirestore(doc);
     }
 
-    // New user
     final now = DateTime.now();
     final newUser = UserModel(
       id: firebaseUser.uid,
-      displayName: firebaseUser.displayName ?? 'Pilot',
+      displayName: displayName ?? firebaseUser.displayName ?? 'Pilot',
       photoUrl: firebaseUser.photoURL,
       language: 'tr',
       dailyGamesResetAt: now,
@@ -81,10 +87,8 @@ class AuthService {
   Future<UserModel?> getCurrentUserModel() async {
     final user = _auth.currentUser;
     if (user == null) return null;
-
     final doc = await _db.collection(AppConstants.colUsers).doc(user.uid).get();
     if (!doc.exists) return null;
-
     return UserModel.fromFirestore(doc);
   }
 }
