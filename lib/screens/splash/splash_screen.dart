@@ -34,10 +34,20 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () async {
       if (!mounted) return;
-      final user = FirebaseAuth.instance.currentUser;
-      context.go(user != null ? '/home' : '/auth');
+      try {
+        // Wait for Firebase Auth to initialize
+        final user = await FirebaseAuth.instance.authStateChanges().first.timeout(
+          const Duration(seconds: 5),
+          onTimeout: () => null,
+        );
+        if (!mounted) return;
+        context.go(user != null ? '/home' : '/auth');
+      } catch (e) {
+        if (!mounted) return;
+        context.go('/auth');
+      }
     });
   }
 
