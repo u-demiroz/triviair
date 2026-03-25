@@ -3,6 +3,15 @@ import '../core/theme/app_theme.dart';
 import '../core/constants/app_constants.dart';
 import '../models/match_model.dart';
 
+String _timeLeft(DateTime? updatedAt) {
+  if (updatedAt == null) return '';
+  final deadline = updatedAt.add(const Duration(hours: 48));
+  final diff = deadline.difference(DateTime.now());
+  if (diff.isNegative) return 'Süresi doldu';
+  if (diff.inHours > 0) return '⏰ ${diff.inHours}s kaldı';
+  return '⏰ ${diff.inMinutes}dk kaldı';
+}
+
 class MatchCard extends StatelessWidget {
   final MatchModel match;
   final String userId;
@@ -105,6 +114,17 @@ class MatchCard extends StatelessWidget {
                       color: AppColors.textSecondary,
                     ),
                   ),
+                  if (!match.isCompleted)
+                    Text(
+                      _timeLeft(match.updatedAt),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: match.updatedAt != null &&
+                            DateTime.now().difference(match.updatedAt!).inHours > 40
+                            ? AppColors.error
+                            : AppColors.textSecondary,
+                      ),
+                    ),
                 ],
               ),
             ),

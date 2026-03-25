@@ -21,6 +21,7 @@ class AuthService {
   Future<UserModel> registerWithEmail(String email, String password, String name) async {
     final cred = await _auth.createUserWithEmailAndPassword(email: email, password: password);
     await cred.user!.updateDisplayName(name);
+    await cred.user!.reload();
     return await _createOrGetUser(cred.user!, displayName: name);
   }
 
