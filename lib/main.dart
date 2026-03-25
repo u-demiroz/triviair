@@ -14,7 +14,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await NotificationService().initialize();
+  // Initialize notifications in background, don't block startup
+  NotificationService().initialize().catchError((e) => print('Notification init error: $e'));
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
