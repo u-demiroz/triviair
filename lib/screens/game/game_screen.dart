@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
@@ -28,6 +29,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   List<AnswerRecord> _answers = [];
   bool _answered = false;
   int? _selectedIndex;
+  // Shuffled options per question: maps shuffled index → original index
+  List<List<int>> _shuffledIndices = [];
   bool _isLoading = true;
 
   // Timer
@@ -72,9 +75,18 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       startIdx + AppConstants.questionsPerPhase,
     );
 
+    // Shuffle options for each question
+    final rng = Random();
+    final shuffled = phaseQuestions.map((q) {
+      final indices = List<int>.generate(q.getOptions('tr').length, (i) => i);
+      indices.shuffle(rng);
+      return indices;
+    }).toList();
+
     setState(() {
       _match = matchDoc;
       _questions = phaseQuestions;
+      _shuffledIndices = shuffled;
       _isLoading = false;
     });
 
@@ -110,18 +122,22 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     _handleAnswer(-1); // timeout = wrong
   }
 
-  void _handleAnswer(int selectedIndex) {
+  void _handleAnswer(int shuffledSelectedIndex) {
     if (_answered) return;
     _timer?.cancel();
 
     final question = _questions[_currentQuestionIndex];
     final elapsed = (AppConstants.questionTimeLimitSeconds - _timeLeft) * 1000;
+    // Map shuffled index back to original
+    final selectedIndex = shuffledSelectedIndex == -1
+        ? -1
+        : _shuffledIndices[_currentQuestionIndex][shuffledSelectedIndex];
     final isCorrect = selectedIndex == question.correctAnswerIndex;
     final score = AnswerRecord.calculateScore(isCorrect, elapsed, AppConstants.questionTimeLimitSeconds);
 
     setState(() {
       _answered = true;
-      _selectedIndex = selectedIndex;
+      _selectedIndex = shuffledSelectedIndex;
       _answers.add(AnswerRecord(
         questionId: question.id,
         answerIndex: selectedIndex,
@@ -301,10 +317,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 child: ListView.separated(
                   itemCount: question.getOptions(lang).length,
                   separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    final option = question.getOptions(lang)[index];
-                    final isCorrect = index == question.correctAnswerIndex;
-                    final isSelected = _selectedIndex == index;
+                  itemBuilder: (context, shuffledIdx) {
+                    final originalIdx = _shuffledIndices.isNotEmpty
+                        ? _shuffledIndices[_currentQuestionIndex][shuffledIdx]
+                        : shuffledIdx;
+                    final option = question.getOptions(lang)[originalIdx];
+                    final isCorrect = originalIdx == question.correctAnswerIndex;
+                    final isSelected = _selectedIndex == shuffledIdx;
+                    final index = shuffledIdx;
 
                     Color bgColor = AppColors.surface;
                     Color borderColor = AppColors.divider;
@@ -325,7 +345,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     }
 
                     return GestureDetector(
-                      onTap: () => _handleAnswer(index),
+                      onTap: () => _handleAnswer(shuffledIdx),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),

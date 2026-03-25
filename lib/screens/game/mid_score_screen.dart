@@ -13,6 +13,8 @@ class MidScoreScreen extends StatelessWidget {
   const MidScoreScreen({super.key, required this.matchId});
 
   @override
+  bool get _isOpenMatch => match.playerB == 'OPEN' || match.playerA == 'OPEN';
+
   Widget build(BuildContext context) {
     final matchService = MatchService();
     final userService = UserService();
