@@ -1,4 +1,5 @@
 name: trivair
+# bundle_id: com.trivair.app
 description: Aviation trivia game - challenge your aviation knowledge!
 publish_to: 'none'
 version: 1.0.0+1
