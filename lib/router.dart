@@ -15,8 +15,15 @@ import 'screens/matchmaking/matchmaking_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/splash',
-    redirect: null,
+    initialLocation: '/auth',
+    redirect: (context, state) {
+      final user = FirebaseAuth.instance.currentUser;
+      final isAuth = user != null;
+      final isOnAuth = state.matchedLocation == '/auth';
+      if (isAuth && isOnAuth) return '/home';
+      if (!isAuth && !isOnAuth && state.matchedLocation != '/auth') return '/auth';
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/splash',
