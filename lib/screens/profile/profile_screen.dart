@@ -224,10 +224,75 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   child: const Text('🏆 Sıralamayı Gör'),
                 ),
+
+                const SizedBox(height: 32),
+                const Divider(color: AppColors.divider),
+                const SizedBox(height: 12),
+
+                // Delete account
+                TextButton(
+                  onPressed: () => _showDeleteAccountDialog(context, authService, userService, userId),
+                  child: const Text(
+                    'Hesabı Sil',
+                    style: TextStyle(color: AppColors.error, fontSize: 14),
+                  ),
+                ),
+                const SizedBox(height: 8),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  void _showDeleteAccountDialog(
+    BuildContext context,
+    AuthService authService,
+    UserService userService,
+    String userId,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: const Text(
+          'Hesabı Sil',
+          style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700),
+        ),
+        content: const Text(
+          'Hesabınızı silmek istediğinizden emin misiniz?\n\nTüm oyun geçmişiniz, puanlarınız ve verileriniz kalıcı olarak silinecektir. Bu işlem geri alınamaz.',
+          style: TextStyle(color: AppColors.textSecondary, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('İptal', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                // Delete user data from Firestore
+                await userService.deleteUserData(userId);
+                // Delete Firebase Auth account
+                await FirebaseAuth.instance.currentUser?.delete();
+                await authService.signOut();
+                if (context.mounted) context.go('/auth');
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Hesap silinemedi: $e'),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Hesabı Sil', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700)),
+          ),
+        ],
       ),
     );
   }

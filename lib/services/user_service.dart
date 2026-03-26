@@ -148,6 +148,15 @@ class UserService {
     return snap.docs.map(UserModel.fromFirestore).toList();
   }
 
+  Future<void> deleteUserData(String userId) async {
+    final batch = _db.batch();
+    // Delete user document
+    batch.delete(_db.collection(AppConstants.colUsers).doc(userId));
+    // Delete from leaderboard
+    batch.delete(_db.collection(AppConstants.colLeaderboard).doc(userId));
+    await batch.commit();
+  }
+
   // LEADERBOARD
   Stream<QuerySnapshot> getLeaderboard({int limit = 50}) {
     return _db
