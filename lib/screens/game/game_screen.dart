@@ -8,6 +8,7 @@ import '../../core/constants/app_constants.dart';
 import '../../models/match_model.dart';
 import '../../models/question_model.dart';
 import '../../services/match_service.dart';
+import '../../services/report_service.dart';
 
 class GameScreen extends StatefulWidget {
   final String matchId;
@@ -19,6 +20,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   final MatchService _matchService = MatchService();
+  final ReportService _reportService = ReportService();
   final String _userId = FirebaseAuth.instance.currentUser!.uid;
 
   MatchModel? _match;
@@ -163,6 +165,64 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     });
   }
 
+  void _showReportDialog(QuestionModel question) {
+    final reasons = [
+      'Yanlış cevap',
+      'Yanıltıcı soru',
+      'Yazım hatası',
+      'Görsel yanlış',
+      'Diğer',
+    ];
+    String selectedReason = reasons[0];
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: const Text(
+            '⚑ Soruyu Bildir',
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 18),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: reasons.map((r) => RadioListTile<String>(
+              title: Text(r, style: const TextStyle(color: AppColors.textPrimary, fontSize: 14)),
+              value: r,
+              groupValue: selectedReason,
+              activeColor: AppColors.primary,
+              onChanged: (v) => setDialogState(() => selectedReason = v!),
+            )).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('İptal', style: TextStyle(color: AppColors.textSecondary)),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(ctx);
+                await _reportService.reportQuestion(
+                  questionId: question.id,
+                  reason: selectedReason,
+                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Bildirim gönderildi, teşekkürler!'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Gönder', style: TextStyle(color: AppColors.primary)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _submitPhase() async {
     await _matchService.submitPhaseAnswers(
       matchId: widget.matchId,
@@ -234,12 +294,25 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
             const SizedBox(height: 16),
 
-            // Timer
+            // Timer + Report
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Report button
+                  GestureDetector(
+                    onTap: () => _showReportDialog(question),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceLight,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.flag_outlined, color: AppColors.textSecondary, size: 18),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     width: 52,
@@ -267,7 +340,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
             // Question
             Padding(
