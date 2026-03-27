@@ -20,6 +20,8 @@ dependencies:
 
   # Auth providers
   google_sign_in: ^6.2.1
+  sign_in_with_apple: ^6.1.2
+  crypto: ^3.0.3
 
   # State management
   flutter_riverpod: ^2.5.1

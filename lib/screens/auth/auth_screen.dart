@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../core/theme/app_theme.dart';
 import '../../services/auth_service.dart';
 
@@ -228,13 +229,11 @@ class _AuthScreenState extends State<AuthScreen> {
 
               const SizedBox(height: 20),
 
-              // Social buttons
-              _SocialButton(
-                label: 'Apple ile Devam Et',
-                emoji: '🍎',
-                color: Colors.white,
-                textColor: Colors.black,
-                onTap: _signInWithApple,
+              // Apple Sign In — official button
+              SignInWithAppleButton(
+                onPressed: _signInWithApple,
+                style: SignInWithAppleButtonStyle.white,
+                borderRadius: const BorderRadius.all(Radius.circular(14)),
               ),
               const SizedBox(height: 10),
               _SocialButton(

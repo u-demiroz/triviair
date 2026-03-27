@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:math';
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 import '../core/constants/app_constants.dart';
@@ -45,14 +49,45 @@ class AuthService {
   // Apple
   Future<UserModel?> signInWithApple() async {
     try {
-      final provider = AppleAuthProvider();
-      provider.addScope('email');
-      provider.addScope('name');
-      final userCredential = await _auth.signInWithProvider(provider);
-      return await _createOrGetUser(userCredential.user!);
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
+
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      final oauthCredential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+
+      final userCredential = await _auth.signInWithCredential(oauthCredential);
+      
+      // Apple only gives name on first sign in
+      final displayName = appleCredential.givenName != null
+          ? '${appleCredential.givenName} ${appleCredential.familyName ?? ''}'.trim()
+          : null;
+
+      return await _createOrGetUser(userCredential.user!, displayName: displayName);
     } catch (e) {
       rethrow;
     }
+  }
+
+  String _generateNonce([int length = 32]) {
+    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)]).join();
+  }
+
+  String _sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
   }
 
   Future<UserModel> _createOrGetUser(User firebaseUser, {String? displayName}) async {
