@@ -257,22 +257,33 @@
   // Admin password
   const ADMIN_PASSWORD = 'TrivAir2026!Admin';
 
+  function showDashboard() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboardScreen').style.display = 'block';
+    loadOverview();
+    loadQuestions();
+    loadUsers();
+    loadMatches();
+    loadReports();
+  }
+
+  // Auto-login if session exists
+  if (sessionStorage.getItem('trivair_admin') === 'true') {
+    showDashboard();
+  }
+
   window.login = function() {
     const pwd = document.getElementById('adminPassword').value;
     if (pwd === ADMIN_PASSWORD) {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('dashboardScreen').style.display = 'block';
-      loadOverview();
-      loadQuestions();
-      loadUsers();
-      loadMatches();
-      loadReports();
+      sessionStorage.setItem('trivair_admin', 'true');
+      showDashboard();
     } else {
       document.getElementById('loginError').textContent = 'Yanlış şifre!';
     }
   };
 
   window.logout = function() {
+    sessionStorage.removeItem('trivair_admin');
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('dashboardScreen').style.display = 'none';
   };
