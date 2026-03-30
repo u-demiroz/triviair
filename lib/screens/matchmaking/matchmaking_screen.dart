@@ -46,21 +46,10 @@ class _MatchmakingScreenState extends State<MatchmakingScreen>
         return;
       }
 
-      // If match already has a real opponent (we joined an existing match), go play
-      if (match.playerB != 'OPEN' && match.playerA != 'OPEN') {
+      // Always go to game — either joined existing or created new OPEN match
+      // If OPEN match: user plays first 5 questions, opponent joins later
+      if (mounted) {
         context.go('/game/${match.id}');
-      } else {
-        // Created new OPEN match — go to home, it'll show as waiting
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✈️ Maçın oluşturuldu! Rakip katılınca sıra sana gelecek.'),
-              backgroundColor: AppColors.primary,
-              duration: Duration(seconds: 3),
-            ),
-          );
-          context.go('/home');
-        }
       }
     } catch (e) {
       if (mounted) {
