@@ -24,13 +24,21 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   Future<void> _loadAd() async {
     setState(() => _shouldShow = true);
 
-    final ad = AdService.createBannerAd(
-      onLoaded: (ad) {
-        print('AdMob: banner loaded!');
-        if (mounted) setState(() => _isLoaded = true);
-      },
+    final ad = BannerAd(
+      adUnitId: AdService.bannerAdUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          if (mounted) setState(() => _isLoaded = true);
+        },
+        onAdFailedToLoad: (ad, error) {
+          print('AdMob failed: $error');
+          ad.dispose();
+        },
+      ),
     );
-    ad.load();
+    await ad.load();
     if (mounted) setState(() => _bannerAd = ad);
   }
 
