@@ -38,8 +38,29 @@ class _MatchmakingScreenState extends State<MatchmakingScreen>
 
     try {
       final match = await _matchService.findRandomMatch(userId);
-      if (match != null && mounted) {
+      if (!mounted) return;
+
+      if (match == null) {
+        // Shouldn't happen but just in case
+        setState(() => _isSearching = false);
+        return;
+      }
+
+      // If match already has a real opponent (we joined an existing match), go play
+      if (match.playerB != 'OPEN' && match.playerA != 'OPEN') {
         context.go('/game/${match.id}');
+      } else {
+        // Created new OPEN match — go to home, it'll show as waiting
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✈️ Maçın oluşturuldu! Rakip katılınca sıra sana gelecek.'),
+              backgroundColor: AppColors.primary,
+              duration: Duration(seconds: 3),
+            ),
+          );
+          context.go('/home');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -56,7 +77,7 @@ class _MatchmakingScreenState extends State<MatchmakingScreen>
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Rakip Bul'),
+        title: const Text('Rastgele Rakip'),
         backgroundColor: AppColors.background,
       ),
       body: SafeArea(
@@ -65,20 +86,20 @@ class _MatchmakingScreenState extends State<MatchmakingScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Animated search indicator
+              // Animated plane icon
               AnimatedBuilder(
                 animation: _pulseController,
                 builder: (context, child) {
                   return Container(
-                    width: 140 + (_isSearching ? _pulseController.value * 20 : 0),
-                    height: 140 + (_isSearching ? _pulseController.value * 20 : 0),
+                    width: 140,
+                    height: 140,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColors.primary.withOpacity(
-                        _isSearching ? 0.1 + _pulseController.value * 0.1 : 0.1,
+                        0.1 + _pulseController.value * 0.05,
                       ),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.4),
+                        color: AppColors.primary.withOpacity(0.3),
                         width: 2,
                       ),
                     ),
@@ -91,9 +112,9 @@ class _MatchmakingScreenState extends State<MatchmakingScreen>
 
               const SizedBox(height: 40),
 
-              Text(
-                _isSearching ? 'Rakip aranıyor...' : 'Rastgele Rakip Bul',
-                style: const TextStyle(
+              const Text(
+                'Rastgele Rakip Bul',
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -102,47 +123,45 @@ class _MatchmakingScreenState extends State<MatchmakingScreen>
 
               const SizedBox(height: 12),
 
-              Text(
-                _isSearching
-                    ? 'Seni oynamayı bekleyen biri var mı kontrol ediyoruz...'
-                    : 'Dünyanın her yerinden bir rakiple karşılaş!',
+              const Text(
+                'Hemen hazır bir rakip varsa direkt oyuna girersin.\nYoksa maçın oluşturulur, rakip gelince sıra sana geçer.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textSecondary,
-                  height: 1.5,
+                  height: 1.6,
+                  fontSize: 14,
                 ),
               ),
 
               const SizedBox(height: 48),
 
-              if (!_isSearching)
+              if (_isSearching)
+                Column(
+                  children: [
+                    const CircularProgressIndicator(color: AppColors.primary),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Rakip aranıyor...',
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                  ],
+                )
+              else
                 ElevatedButton(
                   onPressed: _findMatch,
                   child: const Text('Maç Başlat'),
-                )
-              else ...[
-                const CircularProgressIndicator(color: AppColors.primary),
-                const SizedBox(height: 24),
-                TextButton(
-                  onPressed: () {
-                    setState(() => _isSearching = false);
-                    context.go('/home');
-                  },
-                  child: const Text('İptal'),
                 ),
-              ],
 
               const SizedBox(height: 24),
 
-              // Divider
               Row(
-                children: [
-                  const Expanded(child: Divider(color: AppColors.divider)),
-                  const Padding(
+                children: const [
+                  Expanded(child: Divider(color: AppColors.divider)),
+                  Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text('ya da', style: TextStyle(color: AppColors.textSecondary)),
                   ),
-                  const Expanded(child: Divider(color: AppColors.divider)),
+                  Expanded(child: Divider(color: AppColors.divider)),
                 ],
               ),
 
