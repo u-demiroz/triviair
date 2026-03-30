@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrivAir Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0A0E1A; color: #fff; min-height: 100vh; }
+    
+    /* Login */
+    .login { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .login-box { background: #131929; border: 1px solid #2A3550; border-radius: 20px; padding: 40px; width: 360px; text-align: center; }
+    .login-box h1 { font-size: 24px; margin-bottom: 8px; }
+    .login-box p { color: #8A9BB8; margin-bottom: 32px; font-size: 14px; }
+    .login-box input { width: 100%; padding: 14px; background: #0A0E1A; border: 1px solid #2A3550; border-radius: 12px; color: #fff; font-size: 16px; margin-bottom: 12px; outline: none; }
+    .login-box input:focus { border-color: #1A73E8; }
+    .btn { width: 100%; padding: 14px; background: #1A73E8; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+    .btn:hover { background: #1557b0; }
+    .error { color: #E53935; font-size: 13px; margin-top: 8px; }
+
+    /* Dashboard */
+    .dashboard { display: none; }
+    nav { background: #131929; border-bottom: 1px solid #2A3550; padding: 16px 24px; display: flex; align-items: center; gap: 16px; }
+    nav h1 { font-size: 18px; font-weight: 700; flex: 1; }
+    nav .tab { padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; color: #8A9BB8; transition: all 0.2s; }
+    nav .tab.active, nav .tab:hover { background: #1A73E8; color: #fff; }
+    nav .logout { color: #E53935; cursor: pointer; font-size: 14px; }
+
+    .content { padding: 24px; max-width: 1200px; margin: 0 auto; }
+    
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: #131929; border: 1px solid #2A3550; border-radius: 16px; padding: 20px; }
+    .stat-card .icon { font-size: 28px; margin-bottom: 8px; }
+    .stat-card .value { font-size: 32px; font-weight: 800; color: #1A73E8; }
+    .stat-card .label { font-size: 13px; color: #8A9BB8; margin-top: 4px; }
+
+    /* Table */
+    .section { background: #131929; border: 1px solid #2A3550; border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
+    .section-header { padding: 16px 20px; border-bottom: 1px solid #2A3550; display: flex; align-items: center; gap: 12px; }
+    .section-header h2 { font-size: 16px; font-weight: 600; flex: 1; }
+    .search-input { padding: 8px 14px; background: #0A0E1A; border: 1px solid #2A3550; border-radius: 8px; color: #fff; font-size: 14px; width: 240px; outline: none; }
+    .search-input:focus { border-color: #1A73E8; }
+    select.filter { padding: 8px 12px; background: #0A0E1A; border: 1px solid #2A3550; border-radius: 8px; color: #fff; font-size: 14px; outline: none; cursor: pointer; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 12px 16px; font-size: 12px; text-transform: uppercase; color: #8A9BB8; font-weight: 600; border-bottom: 1px solid #2A3550; }
+    td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid #1E2940; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1E2940; }
+    
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge-blue { background: rgba(26,115,232,0.2); color: #1A73E8; }
+    .badge-green { background: rgba(76,175,80,0.2); color: #4CAF50; }
+    .badge-red { background: rgba(229,57,53,0.2); color: #E53935; }
+    .badge-yellow { background: rgba(255,193,7,0.2); color: #FFC107; }
+    
+    .btn-danger { padding: 6px 12px; background: rgba(229,57,53,0.15); color: #E53935; border: 1px solid rgba(229,57,53,0.3); border-radius: 8px; cursor: pointer; font-size: 13px; }
+    .btn-danger:hover { background: rgba(229,57,53,0.3); }
+    .btn-sm { padding: 6px 12px; background: rgba(26,115,232,0.15); color: #1A73E8; border: 1px solid rgba(26,115,232,0.3); border-radius: 8px; cursor: pointer; font-size: 13px; }
+
+    .loading { text-align: center; padding: 40px; color: #8A9BB8; }
+    .img-preview { width: 48px; height: 48px; object-fit: contain; border-radius: 8px; background: #1E2940; }
+    .truncate { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .pagination { display: flex; gap: 8px; justify-content: center; padding: 16px; }
+    .page-btn { padding: 6px 12px; background: #1E2940; border: 1px solid #2A3550; border-radius: 8px; color: #fff; cursor: pointer; font-size: 13px; }
+    .page-btn.active { background: #1A73E8; border-color: #1A73E8; }
+    .page-btn:hover:not(.active) { background: #2A3550; }
+  </style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div class="login" id="loginScreen">
+  <div class="login-box">
+    <div style="font-size:48px;margin-bottom:16px">✈️</div>
+    <h1>TrivAir Admin</h1>
+    <p>Yönetim paneline erişmek için şifrenizi girin</p>
+    <input type="password" id="adminPassword" placeholder="Şifre" onkeyup="if(event.key==='Enter')login()">
+    <button class="btn" onclick="login()">Giriş</button>
+    <div class="error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div class="dashboard" id="dashboardScreen">
+  <nav>
+    <h1>✈️ TrivAir Admin</h1>
+    <div class="tab active" onclick="showTab('overview')">📊 Genel Bakış</div>
+    <div class="tab" onclick="showTab('questions')">❓ Sorular</div>
+    <div class="tab" onclick="showTab('users')">👥 Kullanıcılar</div>
+    <div class="tab" onclick="showTab('matches')">🎮 Maçlar</div>
+    <div class="tab" onclick="showTab('reports')">🚩 Raporlar</div>
+    <div class="logout" onclick="logout()">Çıkış</div>
+  </nav>
+
+  <div class="content">
+    <!-- Overview Tab -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="stats-grid" id="statsGrid">
+        <div class="loading">Yükleniyor...</div>
+      </div>
+    </div>
+
+    <!-- Questions Tab -->
+    <div class="tab-content" id="tab-questions">
+      <div class="section">
+        <div class="section-header">
+          <h2>Sorular</h2>
+          <input class="search-input" id="questionSearch" placeholder="Soru ara..." oninput="filterQuestions()">
+          <select class="filter" id="categoryFilter" onchange="filterQuestions()">
+            <option value="">Tüm Kategoriler</option>
+            <option value="airport_codes">✈️ Havalimanı Kodları</option>
+            <option value="aircraft_type">🛩️ Uçak Tipleri</option>
+            <option value="logo_recognition">🎨 Logo Tanıma</option>
+            <option value="routes_distance">🗺️ Rota & Mesafe</option>
+            <option value="aviation_cinema">🎬 Sinema</option>
+            <option value="aviation_records">🏆 Rekorlar</option>
+          </select>
+          <select class="filter" id="typeFilter" onchange="filterQuestions()">
+            <option value="">Tüm Tipler</option>
+            <option value="text">📝 Metin</option>
+            <option value="image">🖼️ Görsel</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Görsel</th>
+              <th>Soru</th>
+              <th>Kategori</th>
+              <th>Zorluk</th>
+              <th>Tip</th>
+              <th>İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="questionsTable">
+            <tr><td colspan="6" class="loading">Yükleniyor...</td></tr>
+          </tbody>
+        </table>
+        <div class="pagination" id="questionsPagination"></div>
+      </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div class="tab-content" id="tab-users">
+      <div class="section">
+        <div class="section-header">
+          <h2>Kullanıcılar</h2>
+          <input class="search-input" id="userSearch" placeholder="Kullanıcı ara..." oninput="filterUsers()">
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Kullanıcı</th>
+              <th>Toplam Puan</th>
+              <th>Maçlar</th>
+              <th>Galibiyet</th>
+              <th>Premium</th>
+              <th>Kayıt</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable">
+            <tr><td colspan="6" class="loading">Yükleniyor...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Matches Tab -->
+    <div class="tab-content" id="tab-matches">
+      <div class="section">
+        <div class="section-header">
+          <h2>Aktif Maçlar</h2>
+          <select class="filter" id="matchStatusFilter" onchange="filterMatches()">
+            <option value="">Tüm Durumlar</option>
+            <option value="waiting_b_first_half">Bekliyor (B ilk yarı)</option>
+            <option value="waiting_a_first_half">Bekliyor (A ilk yarı)</option>
+            <option value="mid_score_pending">Ara Skor</option>
+            <option value="completed">Tamamlandı</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Maç ID</th>
+              <th>Oyuncu A</th>
+              <th>Oyuncu B</th>
+              <th>Durum</th>
+              <th>Skor</th>
+              <th>Tarih</th>
+            </tr>
+          </thead>
+          <tbody id="matchesTable">
+            <tr><td colspan="6" class="loading">Yükleniyor...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Reports Tab -->
+    <div class="tab-content" id="tab-reports">
+      <div class="section">
+        <div class="section-header">
+          <h2>Soru Raporları</h2>
+          <select class="filter" id="reportStatusFilter" onchange="filterReports()">
+            <option value="pending">⏳ Bekleyen</option>
+            <option value="resolved">✅ Çözüldü</option>
+            <option value="">Tümü</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Soru</th>
+              <th>Sebep</th>
+              <th>Tarih</th>
+              <th>Durum</th>
+              <th>İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="reportsTable">
+            <tr><td colspan="5" class="loading">Yükleniyor...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc, query, orderBy, limit, where, getCountFromServer } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAhGg83gZoX3i8kK6r6SeLIgGZtuoZL4Os",
+    authDomain: "triviair-2aa41.firebaseapp.com",
+    projectId: "triviair-2aa41",
+    storageBucket: "triviair-2aa41.firebasestorage.app",
+    messagingSenderId: "928837338187",
+    appId: "1:928837338187:web:bf8db7b3bd1bb3efebb9ce",
+    measurementId: "G-0X7P6PBVTY"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.firestoreOps = { collection, getDocs, doc, deleteDoc, updateDoc, query, orderBy, limit, where, getCountFromServer };
+
+  // Admin password
+  const ADMIN_PASSWORD = 'TrivAir2026!Admin';
+
+  window.login = function() {
+    const pwd = document.getElementById('adminPassword').value;
+    if (pwd === ADMIN_PASSWORD) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboardScreen').style.display = 'block';
+      loadOverview();
+      loadQuestions();
+      loadUsers();
+      loadMatches();
+      loadReports();
+    } else {
+      document.getElementById('loginError').textContent = 'Yanlış şifre!';
+    }
+  };
+
+  window.logout = function() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboardScreen').style.display = 'none';
+  };
+
+  window.showTab = function(tab) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    event.target.classList.add('active');
+  };
+
+  // ── OVERVIEW ──────────────────────────────────────────────────────────────
+
+  async function loadOverview() {
+    const { collection, getCountFromServer } = window.firestoreOps;
+    const db = window.db;
+
+    const [qCount, uCount, mCount, rCount] = await Promise.all([
+      getCountFromServer(collection(db, 'questions')),
+      getCountFromServer(collection(db, 'users')),
+      getCountFromServer(collection(db, 'matches')),
+      getCountFromServer(collection(db, 'question_reports')),
+    ]);
+
+    document.getElementById('statsGrid').innerHTML = `
+      <div class="stat-card"><div class="icon">❓</div><div class="value">${qCount.data().count.toLocaleString()}</div><div class="label">Toplam Soru</div></div>
+      <div class="stat-card"><div class="icon">👥</div><div class="value">${uCount.data().count.toLocaleString()}</div><div class="label">Kayıtlı Kullanıcı</div></div>
+      <div class="stat-card"><div class="icon">🎮</div><div class="value">${mCount.data().count.toLocaleString()}</div><div class="label">Toplam Maç</div></div>
+      <div class="stat-card"><div class="icon">🚩</div><div class="value">${rCount.data().count.toLocaleString()}</div><div class="label">Soru Raporu</div></div>
+    `;
+  }
+
+  // ── QUESTIONS ─────────────────────────────────────────────────────────────
+
+  let allQuestions = [];
+  let filteredQuestions = [];
+  const PAGE_SIZE = 50;
+  let currentPage = 0;
+
+  async function loadQuestions() {
+    const { collection, getDocs, query, orderBy } = window.firestoreOps;
+    const snap = await getDocs(query(collection(db, 'questions'), orderBy('createdAt', 'desc')));
+    allQuestions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    filterQuestions();
+  }
+
+  window.filterQuestions = function() {
+    const search = document.getElementById('questionSearch').value.toLowerCase();
+    const cat = document.getElementById('categoryFilter').value;
+    const type = document.getElementById('typeFilter').value;
+    filteredQuestions = allQuestions.filter(q => {
+      const text = (q.translations?.tr?.question || '').toLowerCase();
+      return (!search || text.includes(search)) &&
+             (!cat || q.category === cat) &&
+             (!type || q.type === type);
+    });
+    currentPage = 0;
+    renderQuestions();
+  };
+
+  function renderQuestions() {
+    const start = currentPage * PAGE_SIZE;
+    const page = filteredQuestions.slice(start, start + PAGE_SIZE);
+    const catNames = {
+      airport_codes: '✈️ Hav. Kodu', aircraft_type: '🛩️ Uçak',
+      logo_recognition: '🎨 Logo', routes_distance: '🗺️ Rota',
+      aviation_cinema: '🎬 Sinema', aviation_records: '🏆 Rekor'
+    };
+    document.getElementById('questionsTable').innerHTML = page.map(q => `
+      <tr>
+        <td>${q.imageUrl ? `<img class="img-preview" src="${q.imageUrl}" onerror="this.style.display='none'">` : '—'}</td>
+        <td><div class="truncate">${q.translations?.tr?.question || q.translations?.en?.question || '—'}</div></td>
+        <td><span class="badge badge-blue">${catNames[q.category] || q.category}</span></td>
+        <td><span class="badge ${q.difficulty === 'easy' ? 'badge-green' : q.difficulty === 'hard' ? 'badge-red' : 'badge-yellow'}">${q.difficulty}</span></td>
+        <td>${q.type === 'image' ? '🖼️' : '📝'}</td>
+        <td><button class="btn-danger" onclick="deleteQuestion('${q.id}')">Sil</button></td>
+      </tr>
+    `).join('');
+
+    // Pagination
+    const totalPages = Math.ceil(filteredQuestions.length / PAGE_SIZE);
+    const pagination = document.getElementById('questionsPagination');
+    pagination.innerHTML = '';
+    for (let i = 0; i < totalPages; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+      btn.textContent = i + 1;
+      btn.onclick = () => { currentPage = i; renderQuestions(); };
+      pagination.appendChild(btn);
+    }
+  }
+
+  window.deleteQuestion = async function(id) {
+    if (!confirm('Bu soruyu silmek istediğinizden emin misiniz?')) return;
+    const { doc, deleteDoc } = window.firestoreOps;
+    await deleteDoc(doc(db, 'questions', id));
+    allQuestions = allQuestions.filter(q => q.id !== id);
+    filterQuestions();
+  };
+
+  // ── USERS ─────────────────────────────────────────────────────────────────
+
+  let allUsers = [];
+
+  async function loadUsers() {
+    const { collection, getDocs, query, orderBy } = window.firestoreOps;
+    const snap = await getDocs(query(collection(db, 'users'), orderBy('totalScore', 'desc')));
+    allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderUsers(allUsers);
+  }
+
+  window.filterUsers = function() {
+    const search = document.getElementById('userSearch').value.toLowerCase();
+    renderUsers(allUsers.filter(u => (u.displayName || '').toLowerCase().includes(search)));
+  };
+
+  function renderUsers(users) {
+    document.getElementById('usersTable').innerHTML = users.slice(0, 100).map(u => `
+      <tr>
+        <td><b>${u.displayName || 'İsimsiz'}</b><br><small style="color:#8A9BB8">${u.id.slice(0,8)}...</small></td>
+        <td><b style="color:#1A73E8">${(u.totalScore || 0).toLocaleString()}</b></td>
+        <td>${u.gamesPlayed || 0}</td>
+        <td>${u.gamesWon || 0}</td>
+        <td>${u.isPremium ? '<span class="badge badge-yellow">✨ Premium</span>' : '<span class="badge badge-blue">Free</span>'}</td>
+        <td style="color:#8A9BB8;font-size:12px">${u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('tr') : '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ── MATCHES ───────────────────────────────────────────────────────────────
+
+  let allMatches = [];
+
+  async function loadMatches() {
+    const { collection, getDocs, query, orderBy, limit } = window.firestoreOps;
+    const snap = await getDocs(query(collection(db, 'matches'), orderBy('updatedAt', 'desc'), limit(200)));
+    allMatches = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    filterMatches();
+  }
+
+  window.filterMatches = function() {
+    const status = document.getElementById('matchStatusFilter').value;
+    renderMatches(status ? allMatches.filter(m => m.status === status) : allMatches);
+  };
+
+  function renderMatches(matches) {
+    const statusLabels = {
+      waiting_b_first_half: '⏳ B Oynuyor',
+      waiting_a_first_half: '⏳ A Oynuyor',
+      mid_score_pending: '📊 Ara Skor',
+      waiting_a_second_half: '⏳ A 2. Yarı',
+      waiting_b_second_half: '⏳ B 2. Yarı',
+      completed: '✅ Bitti',
+    };
+    document.getElementById('matchesTable').innerHTML = matches.slice(0, 100).map(m => `
+      <tr>
+        <td style="font-size:11px;color:#8A9BB8">${m.id.slice(0,8)}...</td>
+        <td style="font-size:12px">${m.playerA?.slice(0,8)}...</td>
+        <td style="font-size:12px">${m.playerB === 'OPEN' ? '<span class="badge badge-yellow">OPEN</span>' : m.playerB?.slice(0,8) + '...'}</td>
+        <td><span class="badge ${m.status === 'completed' ? 'badge-green' : 'badge-blue'}">${statusLabels[m.status] || m.status}</span></td>
+        <td>${m.playerAFinalScore || 0} - ${m.playerBFinalScore || 0}</td>
+        <td style="color:#8A9BB8;font-size:12px">${m.updatedAt?.toDate ? m.updatedAt.toDate().toLocaleDateString('tr') : '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ── REPORTS ───────────────────────────────────────────────────────────────
+
+  let allReports = [];
+  let questionCache = {};
+
+  async function loadReports() {
+    const { collection, getDocs, query, orderBy } = window.firestoreOps;
+    const snap = await getDocs(query(collection(db, 'question_reports'), orderBy('createdAt', 'desc')));
+    allReports = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    filterReports();
+  }
+
+  window.filterReports = function() {
+    const status = document.getElementById('reportStatusFilter').value;
+    renderReports(status ? allReports.filter(r => r.status === status) : allReports);
+  };
+
+  async function renderReports(reports) {
+    // Load question texts for reports
+    for (const r of reports.slice(0, 20)) {
+      if (!questionCache[r.questionId] && r.questionId) {
+        try {
+          const { doc } = window.firestoreOps;
+          // We'll just show the ID for now
+          questionCache[r.questionId] = r.questionId.slice(0, 12) + '...';
+        } catch (e) {}
+      }
+    }
+
+    document.getElementById('reportsTable').innerHTML = reports.slice(0, 100).map(r => `
+      <tr>
+        <td style="font-size:12px;color:#8A9BB8">${questionCache[r.questionId] || r.questionId?.slice(0,12) + '...'}</td>
+        <td><b>${r.reason}</b></td>
+        <td style="color:#8A9BB8;font-size:12px">${r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('tr') : '—'}</td>
+        <td><span class="badge ${r.status === 'pending' ? 'badge-yellow' : 'badge-green'}">${r.status === 'pending' ? '⏳ Bekliyor' : '✅ Çözüldü'}</span></td>
+        <td style="display:flex;gap:8px">
+          <button class="btn-sm" onclick="resolveReport('${r.id}')">✅ Çöz</button>
+          <button class="btn-danger" onclick="deleteQuestionFromReport('${r.questionId}', '${r.id}')">Soruyu Sil</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  window.resolveReport = async function(reportId) {
+    const { doc, updateDoc } = window.firestoreOps;
+    await updateDoc(doc(db, 'question_reports', reportId), { status: 'resolved' });
+    allReports = allReports.map(r => r.id === reportId ? { ...r, status: 'resolved' } : r);
+    filterReports();
+  };
+
+  window.deleteQuestionFromReport = async function(questionId, reportId) {
+    if (!confirm('Bu soruyu silmek istediğinizden emin misiniz?')) return;
+    const { doc, deleteDoc, updateDoc } = window.firestoreOps;
+    await deleteDoc(doc(db, 'questions', questionId));
+    await updateDoc(doc(db, 'question_reports', reportId), { status: 'resolved' });
+    allReports = allReports.map(r => r.id === reportId ? { ...r, status: 'resolved' } : r);
+    filterReports();
+  };
+</script>
+
+</body>
+</html>
