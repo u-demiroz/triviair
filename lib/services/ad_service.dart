@@ -8,7 +8,7 @@ class AdService {
   // Test ad unit for development
   static const String _testBannerAdUnitId = 'ca-app-pub-3940256099942544/2934735716';
 
-  static bool _isDebug = true; // test ads during development
+  static bool _isDebug = false; // production ads
 
   static String get bannerAdUnitId =>
       _isDebug ? _testBannerAdUnitId : _bannerAdUnitId;
