@@ -22,18 +22,15 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   }
 
   Future<void> _loadAd() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) return;
-
-    // Always show ads for now (premium check will be added later)
     setState(() => _shouldShow = true);
 
     final ad = AdService.createBannerAd(
       onLoaded: (ad) {
+        print('AdMob: banner loaded!');
         if (mounted) setState(() => _isLoaded = true);
       },
     );
-    await ad.load();
+    ad.load();
     if (mounted) setState(() => _bannerAd = ad);
   }
 
