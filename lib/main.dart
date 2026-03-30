@@ -22,8 +22,8 @@ void main() async {
   // Initialize notifications in background, don't block startup
   NotificationService().initialize().catchError((e) => print('Notification init error: $e'));
 
-  // Initialize AdMob
-  await AdService.initialize();
+  // Initialize AdMob in background
+  AdService.initialize().catchError((e) => print('AdMob init error: $e'));
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
