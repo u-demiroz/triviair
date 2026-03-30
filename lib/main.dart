@@ -6,6 +6,7 @@ import 'core/theme/app_theme.dart';
 import 'router.dart';
 import 'firebase_options.dart';
 import 'services/notification_service.dart';
+import 'services/ad_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,9 @@ void main() async {
 
   // Initialize notifications in background, don't block startup
   NotificationService().initialize().catchError((e) => print('Notification init error: $e'));
+
+  // Initialize AdMob
+  await AdService.initialize();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

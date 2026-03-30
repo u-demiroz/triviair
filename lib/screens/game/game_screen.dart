@@ -9,6 +9,7 @@ import '../../models/match_model.dart';
 import '../../models/question_model.dart';
 import '../../services/match_service.dart';
 import '../../services/report_service.dart';
+import '../../widgets/banner_ad_widget.dart';
 
 class GameScreen extends StatefulWidget {
   final String matchId;
@@ -471,7 +472,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               ),
             ),
 
-            const SizedBox(height: 16),
+            // Banner Ad
+            const BannerAdWidget(),
+            const SizedBox(height: 8),
           ],
         ),
       ),

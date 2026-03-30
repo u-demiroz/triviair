@@ -49,8 +49,8 @@ dependencies:
   # Purchases
   purchases_flutter: ^8.0.0
 
-  # Ads (disabled until AdMob account is ready)
-  # google_mobile_ads: ^5.1.0
+  # Ads
+  google_mobile_ads: ^5.1.0
 
 dev_dependencies:
   flutter_test:
