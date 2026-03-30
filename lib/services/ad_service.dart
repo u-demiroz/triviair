@@ -15,6 +15,12 @@ class AdService {
 
   static Future<void> initialize() async {
     await MobileAds.instance.initialize();
+    // Set test device IDs
+    MobileAds.instance.updateRequestConfiguration(
+      RequestConfiguration(
+        testDeviceIds: ['4aadb8279ac22813f24ab95417dceba0'],
+      ),
+    );
   }
 
   /// Returns true if user should see ads (not premium)
