@@ -25,9 +25,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;
 
-    final shouldShow = await AdService.shouldShowAds(userId);
-    if (!shouldShow || !mounted) return;
-
+    // Always show ads for now (premium check will be added later)
     setState(() => _shouldShow = true);
 
     final ad = AdService.createBannerAd(
