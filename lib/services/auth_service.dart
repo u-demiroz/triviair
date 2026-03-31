@@ -58,6 +58,12 @@ class AuthService {
           AppleIDAuthorizationScopes.fullName,
         ],
         nonce: nonce,
+        webAuthenticationOptions: WebAuthenticationOptions(
+          clientId: 'com.trivair.app.signin',
+          redirectUri: Uri.parse(
+            'https://triviair-2aa41.firebaseapp.com/__/auth/handler',
+          ),
+        ),
       );
 
       final oauthCredential = OAuthProvider('apple.com').credential(
