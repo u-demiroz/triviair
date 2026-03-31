@@ -229,13 +229,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
               const SizedBox(height: 20),
 
-              // Apple Sign In — official button
-              SignInWithAppleButton(
-                onPressed: _signInWithApple,
-                style: SignInWithAppleButtonStyle.white,
-                borderRadius: const BorderRadius.all(Radius.circular(14)),
-              ),
-              const SizedBox(height: 10),
               _SocialButton(
                 label: 'Google ile Devam Et',
                 emoji: 'G',
