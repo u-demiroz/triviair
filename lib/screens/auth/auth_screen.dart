@@ -63,7 +63,7 @@ class _AuthScreenState extends State<AuthScreen> {
       final user = await _authService.signInWithGoogle();
       if (user != null && mounted) context.go('/home');
     } catch (e) {
-      _showError('Google girişi başarısız.');
+      _showError('Google: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -75,7 +75,7 @@ class _AuthScreenState extends State<AuthScreen> {
       final user = await _authService.signInWithApple();
       if (user != null && mounted) context.go('/home');
     } catch (e) {
-      _showError('Apple girişi başarısız.');
+      _showError('Apple: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
