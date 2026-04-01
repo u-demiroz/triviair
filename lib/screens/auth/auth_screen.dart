@@ -216,33 +216,7 @@ class _AuthScreenState extends State<AuthScreen> {
               const SizedBox(height: 24),
 
               // Divider
-              Row(
-                children: const [
-                  Expanded(child: Divider(color: AppColors.divider)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('ya da', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-                  ),
-                  Expanded(child: Divider(color: AppColors.divider)),
-                ],
-              ),
 
-              const SizedBox(height: 20),
-
-              // Apple Sign In — official button
-              SignInWithAppleButton(
-                onPressed: _signInWithApple,
-                style: SignInWithAppleButtonStyle.white,
-                borderRadius: const BorderRadius.all(Radius.circular(14)),
-              ),
-              const SizedBox(height: 10),
-              _SocialButton(
-                label: 'Google ile Devam Et',
-                emoji: 'G',
-                color: AppColors.surfaceLight,
-                textColor: AppColors.textPrimary,
-                onTap: _signInWithGoogle,
-              ),
 
               const SizedBox(height: 24),
             ],
