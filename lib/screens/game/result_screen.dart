@@ -33,6 +33,11 @@ class ResultScreen extends StatelessWidget {
             return _WaitingView(onHome: () => context.go('/home'));
           }
 
+          // If opponent never joined, don't show result screen
+          if (match.playerB == 'OPEN' || match.playerA == 'OPEN') {
+            return _WaitingView(onHome: () => context.go('/home'));
+          }
+
           final isWinner = match.isWinner(userId);
           final isDraw = match.winnerId == null;
           final myScore = match.getPlayerScore(userId);

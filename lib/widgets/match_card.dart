@@ -38,6 +38,10 @@ class MatchCard extends StatelessWidget {
       case AppConstants.statusWaitingBSecondHalf:
         return isPlayerA ? '⏳ Rakip oynuyor...' : '🎯 2. Yarı - Sıra sende!';
       case AppConstants.statusCompleted:
+        // If opponent was OPEN (never joined), don't show as loss
+        if (match.playerB == 'OPEN' || match.playerA == 'OPEN') {
+          return '⏳ Rakip bekleniyor...';
+        }
         if (match.isWinner(userId)) return '🏆 Kazandın!';
         if (match.winnerId == null) return '🤝 Beraberlik';
         return '😔 Kaybettin';
