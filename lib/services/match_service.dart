@@ -202,15 +202,19 @@ class MatchService {
 
   /// Find a random opponent (matchmaking)
   Future<MatchModel?> findRandomMatch(String userId) async {
-    // Look for open matches waiting for player B
+    // Look for open matches waiting for player B (not created by this user)
     final snap = await _db
         .collection(AppConstants.colMatches)
         .where('status', isEqualTo: AppConstants.statusWaitingBFirstHalf)
         .where('playerB', isEqualTo: 'OPEN')
-        .limit(1)
+        .where('playerA', isNotEqualTo: userId)
+        .limit(5)
         .get();
 
-    if (snap.docs.isEmpty) {
+    // Filter out any matches created by this user (extra safety)
+    final validMatches = snap.docs.where((d) => d.data()['playerA'] != userId).toList();
+
+    if (validMatches.isEmpty) {
       // Create an open match waiting for someone
       final questionIds = await _pickRandomQuestions(10);
       final matchData = {
@@ -236,7 +240,7 @@ class MatchService {
       return MatchModel.fromFirestore(doc);
     } else {
       // Join existing open match
-      final matchRef = snap.docs.first.reference;
+      final matchRef = validMatches.first.reference;
       await matchRef.update({
         'playerB': userId,
         'updatedAt': FieldValue.serverTimestamp(),
