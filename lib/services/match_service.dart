@@ -213,13 +213,58 @@ class MatchService {
   }
 
   Future<List<String>> _pickRandomQuestions(int count) async {
-    final snap = await _db
-        .collection(AppConstants.colQuestions)
-        .limit(100)
-        .get();
+    // Category distribution for 10 questions
+    final distribution = {
+      AppConstants.catAirportCodes: 2,
+      AppConstants.catAircraftType: 2,
+      AppConstants.catLogoRecognition: 2,
+      AppConstants.catAviationRecords: 2,
+      AppConstants.catRoutesDistance: 1,
+      AppConstants.catAviationCinema: 1,
+    };
 
-    final allIds = snap.docs.map((d) => d.id).toList()..shuffle();
-    return allIds.take(count).toList();
+    final List<String> selectedIds = [];
+
+    for (final entry in distribution.entries) {
+      final category = entry.key;
+      final needed = entry.value;
+
+      // Get random questions from this category using random offset
+      final totalSnap = await _db
+          .collection(AppConstants.colQuestions)
+          .where('category', isEqualTo: category)
+          .count()
+          .get();
+
+      final total = totalSnap.count ?? 0;
+      if (total == 0) continue;
+
+      // Pick random offset to get different questions each time
+      final maxOffset = (total - needed).clamp(0, total - 1);
+      final offset = maxOffset > 0 ? (DateTime.now().millisecondsSinceEpoch % maxOffset).toInt() : 0;
+
+      final snap = await _db
+          .collection(AppConstants.colQuestions)
+          .where('category', isEqualTo: category)
+          .limit(needed + 20)
+          .get();
+
+      final ids = snap.docs.map((d) => d.id).toList()..shuffle();
+      selectedIds.addAll(ids.take(needed));
+    }
+
+    // If we couldn't fill all slots, pad with random questions
+    if (selectedIds.length < count) {
+      final snap = await _db
+          .collection(AppConstants.colQuestions)
+          .limit(50)
+          .get();
+      final extra = snap.docs.map((d) => d.id).where((id) => !selectedIds.contains(id)).toList()..shuffle();
+      selectedIds.addAll(extra.take(count - selectedIds.length));
+    }
+
+    selectedIds.shuffle();
+    return selectedIds.take(count).toList();
   }
 
   /// Mark mid score as shown
