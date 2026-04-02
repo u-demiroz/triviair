@@ -267,28 +267,34 @@ class MatchService {
       final category = entry.key;
       final needed = entry.value;
 
-      // Get random questions from this category using random offset
-      final totalSnap = await _db
+      // Use random starting point via rand field for true randomness across full pool
+      final randomStart = (DateTime.now().millisecondsSinceEpoch % 1000) / 1000.0;
+      
+      // Use rand field for true random selection across full pool
+      final snap1 = await _db
           .collection(AppConstants.colQuestions)
           .where('category', isEqualTo: category)
-          .count()
+          .where('rand', isGreaterThanOrEqualTo: randomStart)
+          .orderBy('rand')
+          .limit(needed + 5)
           .get();
 
-      final total = totalSnap.count ?? 0;
-      if (total == 0) continue;
+      final List<String> catIds = snap1.docs.map((d) => d.id).toList();
 
-      // Pick random offset to get different questions each time
-      final maxOffset = (total - needed).clamp(0, total - 1);
-      final offset = maxOffset > 0 ? (DateTime.now().millisecondsSinceEpoch % maxOffset).toInt() : 0;
+      // If not enough, wrap around from beginning
+      if (catIds.length < needed) {
+        final snap2 = await _db
+            .collection(AppConstants.colQuestions)
+            .where('category', isEqualTo: category)
+            .where('rand', isLessThan: randomStart)
+            .orderBy('rand')
+            .limit(needed + 5)
+            .get();
+        catIds.addAll(snap2.docs.map((d) => d.id));
+      }
 
-      final snap = await _db
-          .collection(AppConstants.colQuestions)
-          .where('category', isEqualTo: category)
-          .limit(needed + 20)
-          .get();
-
-      final ids = snap.docs.map((d) => d.id).toList()..shuffle();
-      selectedIds.addAll(ids.take(needed));
+      catIds.shuffle();
+      selectedIds.addAll(catIds.take(needed));
     }
 
     // If we couldn't fill all slots, pad with random questions
