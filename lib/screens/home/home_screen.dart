@@ -180,6 +180,8 @@ class HomeScreen extends ConsumerWidget {
                   }
 
                   final matches = snapshot.data ?? [];
+                  final activeMatches = matches.where((m) => !m.isCompleted).toList();
+                  final completedMatches = matches.where((m) => m.isCompleted && m.playerB != 'OPEN' && m.playerA != 'OPEN').toList();
 
                   if (matches.isEmpty) {
                     return Center(
@@ -205,16 +207,36 @@ class HomeScreen extends ConsumerWidget {
                     );
                   }
 
-                  return ListView.builder(
+                  return ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: matches.length,
-                    itemBuilder: (context, index) {
-                      return MatchCard(
-                        match: matches[index],
-                        userId: userId,
-                        onTap: () => context.push('/game/${matches[index].id}'),
-                      );
-                    },
+                    children: [
+                      // Active matches
+                      if (activeMatches.isNotEmpty) ...[
+                        ...activeMatches.map((m) => MatchCard(
+                          match: m,
+                          userId: userId,
+                          onTap: () => context.push('/game/${m.id}'),
+                        )),
+                      ],
+                      // Completed matches
+                      if (completedMatches.isNotEmpty) ...[
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Geçmiş Maçlar',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ...completedMatches.take(10).map((m) => MatchCard(
+                          match: m,
+                          userId: userId,
+                          onTap: () => context.push('/result/${m.id}'),
+                        )),
+                      ],
+                    ],
                   );
                 },
               ),
