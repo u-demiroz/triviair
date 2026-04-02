@@ -76,11 +76,11 @@ class MatchService {
 
       // Check if both phase 2 done → determine winner
       if (nextStatus == AppConstants.statusCompleted) {
-        final updatedMatch = await _getUpdatedScores(matchRef, isPlayerA, phaseScore, match);
-        final winnerId = _determineWinner(updatedMatch);
-        updateData['winnerId'] = winnerId;
-        await _updateLeaderboard(updatedMatch, winnerId);
-        await _updateUserStats(updatedMatch, winnerId);
+        final updatedScores = await _getUpdatedScores(matchRef, isPlayerA, phaseScore, match);
+        final winnerKey = _determineWinner(updatedScores);
+        final winnerUserId = winnerKey == 'playerA' ? match.playerA : (winnerKey == 'playerB' ? match.playerB : null);
+        updateData['winnerId'] = winnerUserId;
+        await _finishMatch(match, updatedScores, winnerUserId);
       }
     }
 
@@ -128,12 +128,46 @@ class MatchService {
     return null; // draw
   }
 
-  Future<void> _updateLeaderboard(Map<String, int> scores, String? winnerId) async {
-    // leaderboard update logic (handled separately)
-  }
+  Future<void> _finishMatch(MatchModel match, Map<String, int> scores, String? winnerUserId) async {
+    final batch = _db.batch();
+    final playerAId = match.playerA;
+    final playerBId = match.playerB;
+    final scoreA = scores['playerA'] ?? 0;
+    final scoreB = scores['playerB'] ?? 0;
 
-  Future<void> _updateUserStats(Map<String, int> scores, String? winnerId) async {
-    // user stats update (handled separately)
+    // Update user stats and scores
+    for (final entry in [{
+      'userId': playerAId,
+      'score': scoreA,
+      'won': winnerUserId == playerAId,
+    }, {
+      'userId': playerBId,
+      'score': scoreB,
+      'won': winnerUserId == playerBId,
+    }]) {
+      if (entry['userId'] == 'OPEN') continue;
+      final userId = entry['userId'] as String;
+      final score = entry['score'] as int;
+      final won = entry['won'] as bool;
+
+      final userRef = _db.collection('users').doc(userId);
+      batch.update(userRef, {
+        'totalScore': FieldValue.increment(score),
+        'gamesPlayed': FieldValue.increment(1),
+        if (won) 'gamesWon': FieldValue.increment(1),
+      });
+
+      // Update leaderboard
+      final lbRef = _db.collection('leaderboard').doc(userId);
+      batch.set(lbRef, {
+        'totalScore': FieldValue.increment(score),
+        'gamesPlayed': FieldValue.increment(1),
+        if (won) 'gamesWon': FieldValue.increment(1),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    }
+
+    await batch.commit();
   }
 
   /// Get all active matches for a user
