@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../core/theme/app_theme.dart';
 import '../../services/match_service.dart';
 import '../../services/user_service.dart';
@@ -94,6 +95,18 @@ class HomeScreen extends ConsumerWidget {
                         ),
                       const SizedBox(width: 8),
                       GestureDetector(
+                        onTap: () => context.push('/marketplace'),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceLight,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Text('🛒', style: TextStyle(fontSize: 18)),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
                         onTap: () => context.push('/leaderboard'),
                         child: Container(
                           padding: const EdgeInsets.all(8),
@@ -129,13 +142,25 @@ class HomeScreen extends ConsumerWidget {
                       onTap: () => context.push('/matchmaking'),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: _ActionButton(
                       icon: '👥',
                       label: 'Arkadaş Davet Et',
                       color: AppColors.surfaceLight,
                       onTap: () => context.push('/friends'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _ActionButton(
+                      icon: '📤',
+                      label: 'Paylaş',
+                      color: AppColors.surfaceLight,
+                      onTap: () => Share.share(
+                        '✈️ TrivAir\'de havacılık bilgini test et!\nBenimle yarışmak ister misin? 🏆\nhttps://apps.apple.com/us/app/triviair/id6761112939',
+                        subject: 'TrivAir - Havacılık Trivia Oyunu',
+                      ),
                     ),
                   ),
                 ],

@@ -12,6 +12,7 @@ import 'screens/leaderboard/leaderboard_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/friends/friends_screen.dart';
 import 'screens/matchmaking/matchmaking_screen.dart';
+import 'screens/marketplace/marketplace_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -70,6 +71,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/matchmaking',
         builder: (context, state) => const MatchmakingScreen(),
+      ),
+      GoRoute(
+        path: '/marketplace',
+        builder: (context, state) => const MarketplaceScreen(),
       ),
     ],
   );
