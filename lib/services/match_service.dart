@@ -270,7 +270,7 @@ class MatchService {
       final snap = await _db
           .collection(AppConstants.colQuestions)
           .where('category', isEqualTo: category)
-          .limit(100)
+          .limit(441)
           .get();
 
       final ids = snap.docs.map((d) => d.id).toList()..shuffle();
