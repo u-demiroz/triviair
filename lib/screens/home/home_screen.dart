@@ -157,10 +157,16 @@ class HomeScreen extends ConsumerWidget {
                       icon: '📤',
                       label: 'Paylaş',
                       color: AppColors.surfaceLight,
-                      onTap: () => Share.share(
-                        '✈️ TrivAir\'de havacılık bilgini test et!\nBenimle yarışmak ister misin? 🏆\nhttps://apps.apple.com/us/app/triviair/id6761112939',
-                        subject: 'TrivAir - Havacılık Trivia Oyunu',
-                      ),
+                      onTap: () {
+                        final box = context.findRenderObject() as RenderBox?;
+                        Share.share(
+                          '✈️ TrivAir\'de havacılık bilgini test et!\nBenimle yarışmak ister misin? 🏆\nhttps://apps.apple.com/us/app/triviair/id6761112939',
+                          subject: 'TrivAir - Havacılık Trivia Oyunu',
+                          sharePositionOrigin: box != null
+                              ? box.localToGlobal(Offset.zero) & box.size
+                              : const Rect.fromLTWH(100, 100, 200, 200),
+                        );
+                      },
                     ),
                   ),
                 ],
