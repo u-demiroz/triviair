@@ -267,35 +267,15 @@ class MatchService {
       final category = entry.key;
       final needed = entry.value;
 
-      // Use random starting point via rand field for true randomness across full pool
-      final randomStart = (DateTime.now().millisecondsSinceEpoch % 1000) / 1000.0;
-      
-      // Use rand field for true random selection across full pool
-      // Single query: get from random start point
-      final snap1 = await _db
+      // Simple random selection - works without extra indexes
+      final snap = await _db
           .collection(AppConstants.colQuestions)
           .where('category', isEqualTo: category)
-          .where('rand', isGreaterThanOrEqualTo: randomStart)
-          .orderBy('rand')
-          .limit(needed + 10)
+          .limit(60)
           .get();
 
-      final List<String> catIds = snap1.docs.map((d) => d.id).toList();
-
-      // If not enough, get from beginning (wrap around)
-      if (catIds.length < needed) {
-        final snap2 = await _db
-            .collection(AppConstants.colQuestions)
-            .where('category', isEqualTo: category)
-            .orderBy('rand')
-            .limit(needed + 10)
-            .get();
-        final extra = snap2.docs.map((d) => d.id).where((id) => !catIds.contains(id)).toList();
-        catIds.addAll(extra);
-      }
-
-      catIds.shuffle();
-      selectedIds.addAll(catIds.take(needed));
+      final ids = snap.docs.map((d) => d.id).toList()..shuffle();
+      selectedIds.addAll(ids.take(needed));
     }
 
     // If we couldn't fill all slots, pad with random questions
