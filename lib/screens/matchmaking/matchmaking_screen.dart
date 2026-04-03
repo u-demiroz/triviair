@@ -51,10 +51,12 @@ class _MatchmakingScreenState extends State<MatchmakingScreen>
       if (mounted) {
         context.go('/game/${match.id}');
       }
-    } catch (e) {
+    } catch (e, stack) {
+      print('MATCH ERROR: $e');
+      print('STACK: $stack');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Hata: $e')),
+          SnackBar(content: Text('$e')),
         );
         setState(() => _isSearching = false);
       }
