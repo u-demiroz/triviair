@@ -202,13 +202,12 @@ class MatchService {
 
   /// Find a random opponent (matchmaking)
   Future<MatchModel?> findRandomMatch(String userId) async {
-    // Look for open matches waiting for player B (not created by this user)
+    // Look for open matches waiting for player B
     final snap = await _db
         .collection(AppConstants.colMatches)
         .where('status', isEqualTo: AppConstants.statusWaitingBFirstHalf)
         .where('playerB', isEqualTo: 'OPEN')
-        .where('playerA', isNotEqualTo: userId)
-        .limit(5)
+        .limit(10)
         .get();
 
     // Filter out any matches created by this user (extra safety)
