@@ -271,26 +271,27 @@ class MatchService {
       final randomStart = (DateTime.now().millisecondsSinceEpoch % 1000) / 1000.0;
       
       // Use rand field for true random selection across full pool
+      // Single query: get from random start point
       final snap1 = await _db
           .collection(AppConstants.colQuestions)
           .where('category', isEqualTo: category)
           .where('rand', isGreaterThanOrEqualTo: randomStart)
           .orderBy('rand')
-          .limit(needed + 5)
+          .limit(needed + 10)
           .get();
 
       final List<String> catIds = snap1.docs.map((d) => d.id).toList();
 
-      // If not enough, wrap around from beginning
+      // If not enough, get from beginning (wrap around)
       if (catIds.length < needed) {
         final snap2 = await _db
             .collection(AppConstants.colQuestions)
             .where('category', isEqualTo: category)
-            .where('rand', isLessThan: randomStart)
             .orderBy('rand')
-            .limit(needed + 5)
+            .limit(needed + 10)
             .get();
-        catIds.addAll(snap2.docs.map((d) => d.id));
+        final extra = snap2.docs.map((d) => d.id).where((id) => !catIds.contains(id)).toList();
+        catIds.addAll(extra);
       }
 
       catIds.shuffle();
