@@ -267,32 +267,14 @@ class MatchService {
       final category = entry.key;
       final needed = entry.value;
 
-      // True random selection using rand field across full question pool
-      final randomStart = (DateTime.now().millisecondsSinceEpoch % 1000) / 1000.0;
-
       final snap = await _db
           .collection(AppConstants.colQuestions)
           .where('category', isEqualTo: category)
-          .where('rand', isGreaterThanOrEqualTo: randomStart)
-          .orderBy('rand')
-          .limit(needed + 10)
+          .limit(100)
           .get();
 
-      final List<String> catIds = snap.docs.map((d) => d.id).toList();
-
-      // Wrap around if not enough
-      if (catIds.length < needed) {
-        final snap2 = await _db
-            .collection(AppConstants.colQuestions)
-            .where('category', isEqualTo: category)
-            .orderBy('rand')
-            .limit(needed + 10)
-            .get();
-        catIds.addAll(snap2.docs.map((d) => d.id).where((id) => !catIds.contains(id)));
-      }
-
-      catIds.shuffle();
-      selectedIds.addAll(catIds.take(needed));
+      final ids = snap.docs.map((d) => d.id).toList()..shuffle();
+      selectedIds.addAll(ids.take(needed));
     }
 
     // If we couldn't fill all slots, pad with random questions
