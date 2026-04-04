@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delete Account — TrivAir</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0A0E1A; color: #fff; min-height: 100vh; }
+    nav { display: flex; align-items: center; gap: 10px; padding: 20px 40px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; text-decoration: none; color: #fff; }
+    .logo-icon { width: 32px; height: 32px; background: #1A73E8; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .container { max-width: 600px; margin: 40px auto; padding: 0 20px 80px; }
+    h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; color: #E53935; }
+    .subtitle { color: #8A9BB8; margin-bottom: 32px; font-size: 15px; }
+    .card { background: #131929; border: 1px solid #2A3550; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .card h2 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+    .card p { color: #8A9BB8; font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
+    .card ul { color: #8A9BB8; font-size: 14px; line-height: 1.8; padding-left: 20px; }
+    .btn-delete { display: block; width: 100%; padding: 16px; background: #E53935; color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; margin-top: 24px; }
+    .btn-delete:hover { background: #c62828; }
+    .btn-cancel { display: block; width: 100%; padding: 14px; background: #1E2940; color: #8A9BB8; border: none; border-radius: 14px; font-size: 15px; font-weight: 500; cursor: pointer; text-align: center; text-decoration: none; margin-top: 10px; }
+    footer { border-top: 1px solid #2A3550; padding: 24px 20px; text-align: center; color: #8A9BB8; font-size: 13px; }
+    footer a { color: #8A9BB8; text-decoration: none; margin: 0 10px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">
+    <div class="logo-icon">✈️</div>
+    TrivAir
+  </a>
+</nav>
+
+<div class="container">
+  <h1>🗑️ Delete Account</h1>
+  <p class="subtitle">We're sorry to see you go. Please read the information below before proceeding.</p>
+
+  <div class="card">
+    <h2>What will be deleted</h2>
+    <p>Deleting your account is permanent and cannot be undone. The following data will be permanently removed:</p>
+    <ul>
+      <li>Your profile (name, photo, email)</li>
+      <li>Your game history and match records</li>
+      <li>Your score and leaderboard ranking</li>
+      <li>Your friend connections</li>
+      <li>Any purchased items (jokers, premium)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>How to delete your account</h2>
+    <p>You can delete your account directly from the app:</p>
+    <ul>
+      <li>Open TrivAir</li>
+      <li>Go to your Profile tab</li>
+      <li>Scroll to the bottom</li>
+      <li>Tap "Hesabı Sil" (Delete Account)</li>
+      <li>Confirm deletion</li>
+    </ul>
+    <p style="margin-top: 12px;">Or you can send a deletion request to our support email below.</p>
+  </div>
+
+  <div class="card">
+    <h2>Request deletion by email</h2>
+    <p>Send an email to <a href="mailto:support@trivair.app" style="color: #1A73E8;">support@trivair.app</a> with:</p>
+    <ul>
+      <li>Subject: "Account Deletion Request"</li>
+      <li>Your registered email address</li>
+      <li>Your username (if known)</li>
+    </ul>
+    <p style="margin-top: 12px;">We will process your request within 30 days.</p>
+  </div>
+
+  <a href="mailto:support@trivair.app?subject=Account%20Deletion%20Request&body=Please%20delete%20my%20TrivAir%20account.%0A%0AEmail%3A%20%0AUsername%3A%20" class="btn-delete">
+    📧 Send Deletion Request via Email
+  </a>
+  <a href="index.html" class="btn-cancel">← Back to TrivAir</a>
+</div>
+
+<footer>
+  © 2026 TrivAir · <a href="index.html">Home</a> · <a href="privacy.html">Privacy Policy</a>
+</footer>
+
+</body>
+</html>
