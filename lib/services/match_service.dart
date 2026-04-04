@@ -157,13 +157,17 @@ class MatchService {
         if (won) 'gamesWon': FieldValue.increment(1),
       });
 
-      // Update leaderboard
+      // Update leaderboard (fetch name from users)
+      final userSnap = await _db.collection('users').doc(userId).get();
+      final userData = userSnap.data();
       final lbRef = _db.collection('leaderboard').doc(userId);
       batch.set(lbRef, {
         'totalScore': FieldValue.increment(score),
         'gamesPlayed': FieldValue.increment(1),
         if (won) 'gamesWon': FieldValue.increment(1),
         'updatedAt': FieldValue.serverTimestamp(),
+        'displayName': userData?['displayName'] ?? 'Pilot',
+        'photoUrl': userData?['photoUrl'],
       }, SetOptions(merge: true));
     }
 

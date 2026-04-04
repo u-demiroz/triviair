@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/theme/app_theme.dart';
 import '../../services/user_service.dart';
 import '../../widgets/avatar_widget.dart';
+import '../profile/user_profile_screen.dart';
 
 class LeaderboardScreen extends StatelessWidget {
   const LeaderboardScreen({super.key});
@@ -47,6 +48,16 @@ class LeaderboardScreen extends StatelessWidget {
                     width: isMe ? 1.5 : 1,
                   ),
                 ),
+                onTap: isMe ? null : () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => UserProfileScreen(
+                      userId: docs[index].id,
+                      displayName: data['displayName'] ?? 'Pilot',
+                      photoUrl: data['photoUrl'],
+                      totalScore: data['totalScore'] ?? 0,
+                    ),
+                  ));
+                },
                 child: Row(
                   children: [
                     // Rank
@@ -71,7 +82,7 @@ class LeaderboardScreen extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        isMe ? 'Sen (${data['displayName'] ?? ''})' : (data['displayName'] ?? ''),
+                        isMe ? 'Sen (${data['displayName'] ?? ''})' : (data['displayName'] ?? 'Pilot'),
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: isMe ? FontWeight.w700 : FontWeight.w500,
