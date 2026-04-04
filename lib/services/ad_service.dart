@@ -1,17 +1,24 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AdService {
-  static const String _bannerAdUnitId = 'ca-app-pub-7981275600812373/1616298211';
+  // iOS banner
+  static const String _iosBannerAdUnitId = 'ca-app-pub-7981275600812373/1616298211';
+  // Android banner
+  static const String _androidBannerAdUnitId = 'ca-app-pub-7981275600812373/2956050600';
 
-  // Test ad unit for development
+  // Test ad units
   static const String _testBannerAdUnitId = 'ca-app-pub-3940256099942544/2934735716';
 
   static bool _isDebug = false; // production ads
 
-  static String get bannerAdUnitId =>
-      _isDebug ? _testBannerAdUnitId : _bannerAdUnitId;
+  static String get bannerAdUnitId {
+    if (_isDebug) return _testBannerAdUnitId;
+    if (defaultTargetPlatform == TargetPlatform.android) return _androidBannerAdUnitId;
+    return _iosBannerAdUnitId;
+  }
 
   static Future<void> initialize() async {
     await MobileAds.instance.initialize();
