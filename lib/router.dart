@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'screens/shell/main_shell.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/auth/auth_screen.dart';
 import 'screens/home/home_screen.dart';
@@ -35,8 +36,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const AuthScreen(),
       ),
       GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
+        path: '/matchmaking',
+        builder: (context, state) => const MatchmakingScreen(),
       ),
       GoRoute(
         path: '/game/:matchId',
@@ -56,25 +57,30 @@ final routerProvider = Provider<GoRouter>((ref) {
           matchId: state.pathParameters['matchId']!,
         ),
       ),
-      GoRoute(
-        path: '/leaderboard',
-        builder: (context, state) => const LeaderboardScreen(),
-      ),
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
-        path: '/friends',
-        builder: (context, state) => const FriendsScreen(),
-      ),
-      GoRoute(
-        path: '/matchmaking',
-        builder: (context, state) => const MatchmakingScreen(),
-      ),
-      GoRoute(
-        path: '/marketplace',
-        builder: (context, state) => const MarketplaceScreen(),
+      ShellRoute(
+        builder: (context, state, child) => MainShell(child: child),
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/leaderboard',
+            builder: (context, state) => const LeaderboardScreen(),
+          ),
+          GoRoute(
+            path: '/friends',
+            builder: (context, state) => const FriendsScreen(),
+          ),
+          GoRoute(
+            path: '/marketplace',
+            builder: (context, state) => const MarketplaceScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+        ],
       ),
     ],
   );

@@ -65,6 +65,9 @@ class HomeScreen extends ConsumerWidget {
                                     color: AppColors.textSecondary,
                                   ),
                                 ),
+                                const SizedBox(width: 12),
+                                const Text('✈️', style: TextStyle(fontSize: 12)),
+                                const Text(' Pilot', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                               ],
                             ),
                           ],
@@ -132,42 +135,63 @@ class HomeScreen extends ConsumerWidget {
             // Action buttons
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
+              child: Column(
                 children: [
-                  Expanded(
-                    child: _ActionButton(
-                      icon: '🎲',
-                      label: 'Rastgele Rakip',
-                      color: AppColors.primary,
-                      onTap: () => context.push('/matchmaking'),
+                  // Hero button - büyük gradient "Hemen Oyna"
+                  GestureDetector(
+                    onTap: () => context.push('/matchmaking'),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [AppColors.primary, Color(0xFF00B4FF)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.4),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('🎲  HEMEN OYNA', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 1)),
+                              SizedBox(height: 4),
+                              Text('Rastgele rakip bul', style: TextStyle(fontSize: 13, color: Colors.white70)),
+                            ],
+                          ),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
+                            child: const Icon(Icons.arrow_forward, color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: _ActionButton(
-                      icon: '👥',
-                      label: 'Arkadaş Davet Et',
-                      color: AppColors.surfaceLight,
-                      onTap: () => context.push('/friends'),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: _ActionButton(
-                      icon: '📤',
-                      label: 'Paylaş',
-                      color: AppColors.surfaceLight,
-                      onTap: () {
+                  const SizedBox(height: 12),
+                  // İkincil butonlar — 2'li grid
+                  Row(
+                    children: [
+                      Expanded(child: _ActionButton(icon: '👥', label: 'Arkadaş\nDavet Et', color: AppColors.surfaceLight, onTap: () => context.push('/friends'))),
+                      const SizedBox(width: 10),
+                      Expanded(child: _ActionButton(icon: '📤', label: 'Paylaş', color: AppColors.surfaceLight, onTap: () {
                         final box = context.findRenderObject() as RenderBox?;
                         Share.share(
-                          '✈️ TrivAir\'de havacılık bilgini test et!\nBenimle yarışmak ister misin? 🏆\nhttps://apps.apple.com/us/app/triviair/id6761112939',
-                          subject: 'TrivAir - Havacılık Trivia Oyunu',
-                          sharePositionOrigin: box != null
-                              ? box.localToGlobal(Offset.zero) & box.size
-                              : const Rect.fromLTWH(100, 100, 200, 200),
+                          '✈️ TrivAir\'de havacılık bilgini test et!\nhttps://apps.apple.com/us/app/triviair/id6761112939',
+                          sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : const Rect.fromLTWH(100, 100, 200, 200),
                         );
-                      },
-                    ),
+                      })),
+                    ],
                   ),
                 ],
               ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
@@ -137,6 +138,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         : _shuffledIndices[_currentQuestionIndex][shuffledSelectedIndex];
     final isCorrect = selectedIndex == question.correctAnswerIndex;
     final score = AnswerRecord.calculateScore(isCorrect, elapsed, AppConstants.questionTimeLimitSeconds);
+
+    if (isCorrect) {
+      HapticFeedback.mediumImpact();
+    } else {
+      HapticFeedback.heavyImpact();
+    }
 
     setState(() {
       _answered = true;
