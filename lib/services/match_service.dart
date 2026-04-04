@@ -214,8 +214,11 @@ class MatchService {
         .limit(10)
         .get();
 
-    // Filter out any matches created by this user (extra safety)
-    final validMatches = snap.docs.where((d) => d.data()['playerA'] != userId).toList();
+    // Filter out matches created by this user (prevent self-match)
+    final validMatches = snap.docs.where((d) {
+      final data = d.data();
+      return data['playerA'] != userId && data['playerB'] != userId;
+    }).toList();
 
     if (validMatches.isEmpty) {
       // Create an open match waiting for someone

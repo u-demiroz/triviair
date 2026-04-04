@@ -67,9 +67,27 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   Future<void> _loadMatch() async {
     final matchDoc = await _matchService.getMatch(widget.matchId).first;
-    final questions = await _matchService.getMatchQuestions(matchDoc.questionIds);
 
     _isPlayerA = matchDoc.isPlayerA(_userId);
+
+    // Check if it's actually this user's turn
+    final isMyTurn = _isMyTurnToPlay(matchDoc);
+    if (!isMyTurn) {
+      if (!mounted) return;
+      // Not my turn — go to appropriate screen
+      if (matchDoc.isCompleted) {
+        context.go('/result/${widget.matchId}');
+      } else if (matchDoc.status == AppConstants.statusMidScorePending ||
+                 matchDoc.status == AppConstants.statusWaitingASecondHalf ||
+                 matchDoc.status == AppConstants.statusWaitingBSecondHalf) {
+        context.go('/mid-score/${widget.matchId}');
+      } else {
+        context.go('/home');
+      }
+      return;
+    }
+
+    final questions = await _matchService.getMatchQuestions(matchDoc.questionIds);
     _phase = _determinePhase(matchDoc);
 
     // Get questions for current phase
@@ -95,6 +113,24 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     });
 
     _startTimer();
+  }
+
+  bool _isMyTurnToPlay(MatchModel match) {
+    final isPlayerA = match.isPlayerA(_userId);
+    switch (match.status) {
+      case AppConstants.statusWaitingBFirstHalf:
+        return !isPlayerA; // B's turn
+      case AppConstants.statusWaitingAFirstHalf:
+        return isPlayerA; // A's turn
+      case AppConstants.statusMidScorePending:
+        return false; // Neither, show mid score
+      case AppConstants.statusWaitingASecondHalf:
+        return isPlayerA; // A's turn
+      case AppConstants.statusWaitingBSecondHalf:
+        return !isPlayerA; // B's turn
+      default:
+        return false;
+    }
   }
 
   int _determinePhase(MatchModel match) {
