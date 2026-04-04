@@ -39,13 +39,13 @@ class LeaderboardScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       // 2. kişi (sol)
-                      Expanded(child: _PodiumCard(rank: 2, doc: docs[1], userId: userId, height: 100)),
+                      Expanded(child: _PodiumCard(rank: 2, doc: docs[1], userId: userId, height: 140)),
                       const SizedBox(width: 8),
                       // 1. kişi (orta, yüksek)
-                      Expanded(child: _PodiumCard(rank: 1, doc: docs[0], userId: userId, height: 130)),
+                      Expanded(child: _PodiumCard(rank: 1, doc: docs[0], userId: userId, height: 170)),
                       const SizedBox(width: 8),
                       // 3. kişi (sağ)
-                      Expanded(child: _PodiumCard(rank: 3, doc: docs[2], userId: userId, height: 80)),
+                      Expanded(child: _PodiumCard(rank: 3, doc: docs[2], userId: userId, height: 120)),
                     ],
                   ),
                 ),
